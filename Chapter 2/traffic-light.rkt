@@ -7,21 +7,23 @@
 ;; But I don't see it producing less code. Also, the way I've defined my TL is ugly and maybe backwards, but I can't see the alternative take being better.
 ;; Certainly, I am missing something.
 
-; TrafficLight -> TrafficLight
+
+; An N-TrafficLight is one of:
+; – 0 interpretation the traffic light shows red
+; – 1 interpretation the traffic light shows green
+; – 2 interpretation the traffic light shows yellow
+
+; N-TrafficLight -> N-TrafficLight
 ; yields the next state, given current state cs
-; TESTS
-(check-expect (tl-next "green") "yellow")
-(check-expect (tl-next "yellow") "red")
-(check-expect (tl-next "red") "green")
-(define (tl-next cs)
-  (cond
-    [(string=? cs "green") "yellow"]
-    [(string=? cs "yellow") "red"]
-    [(string=? cs "red") "green"]))
+(check-expect (tl-next-numeric 0) 1)
+(check-expect (tl-next-numeric 1) 2)
+(check-expect (tl-next-numeric 2) 0)
+(define (tl-next-numeric cs) (modulo (+ cs 1) 3))
+
 
 ; TrafficLight -> Image
 ; renders the current state cs as an image
-(check-expect (tl-render "green") (overlay/offset
+(check-expect (tl-render 1) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "outline" "yellow")
@@ -31,7 +33,7 @@
         (circle 10 "outline" "red"))
     0 0
     (empty-scene 90 30)))
-(check-expect (tl-render "yellow") (overlay/offset
+(check-expect (tl-render 2) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "solid" "yellow")
@@ -41,7 +43,7 @@
         (circle 10 "outline" "red"))
     0 0
     (empty-scene 90 30)))
-(check-expect (tl-render "red") (overlay/offset
+(check-expect (tl-render 0) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "outline" "yellow")
@@ -51,10 +53,11 @@
         (circle 10 "solid" "red"))
     0 0
   (empty-scene 90 30)))
+
 ;; IMPLEMENTATION
 (define (tl-render current-state)
   (cond
-    [(string=? current-state "green") (overlay/offset
+    [(= current-state 1) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "outline" "yellow")
@@ -64,7 +67,7 @@
         (circle 10 "outline" "red"))
     0 0
     (empty-scene 90 30))]
-    [(string=? current-state "yellow") (overlay/offset
+    [(= current-state 2) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "solid" "yellow")
@@ -74,7 +77,7 @@
         (circle 10 "outline" "red"))
     0 0
     (empty-scene 90 30))]
-    [(string=? current-state "red") (overlay/offset
+    [(= current-state 0) (overlay/offset
   (overlay/offset
         (overlay/offset
             (circle 10 "outline" "yellow")
@@ -90,7 +93,7 @@
 (define (traffic-light-simulation initial-state)
   (big-bang initial-state
             (to-draw tl-render)
-            (on-tick tl-next 3)))
+            (on-tick tl-next-numeric 3)))
 
 ;; (underlay
 ;;  (place-image (circle 10 "outline" "red") 15 15 (empty-scene 90 30))
@@ -98,12 +101,12 @@
 ;;  (place-image (circle 10 "outline" "green") (+ 15 60) 15 (empty-scene 90 30)))
 
 
-(place-images/align
- (list (circle 10 "outline" "red")
-       (circle 10 "outline" "yellow")
-       (circle 10 "outline" "green"))
- (list (make-posn 5 4)
-       (make-posn 35 4)
-       (make-posn 65 4))
- "left" "top"
- (empty-scene 90 30))
+;; (place-images/align
+;;  (list (circle 10 "outline" "red")
+;;        (circle 10 "outline" "yellow")
+;;        (circle 10 "outline" "green"))
+;;  (list (make-posn 5 4)
+;;        (make-posn 35 4)
+;;        (make-posn 65 4))
+;;  "left" "top"
+;;  (empty-scene 90 30))
