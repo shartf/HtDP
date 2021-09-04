@@ -47,6 +47,6 @@
 ; simulates a door with an automatic door closer
 (define (door-simulation initial-state)
   (big-bang initial-state
-    [on-tick door-closer]
+    [on-tick door-closer 3]
     [on-key door-action]
     [to-draw door-render]))
