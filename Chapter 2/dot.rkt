@@ -10,7 +10,7 @@
 (define (main p0)
   (big-bang p0
             (on-tick x+)
-            ;;(on-mouse reset-dot)
+            (on-mouse reset-dot)
             (to-draw scene+dot)))
 
 ; Posn -> Image
@@ -36,3 +36,17 @@
               (make-posn 20 0))
 (define (posn-up-x p n)
   (make-posn (+ (posn-x p) n) (posn-y p)))
+
+; Posn Number Number MouseEvt -> Posn
+; for mouse clicks, (make-posn x y); otherwise p
+(check-expect
+ (reset-dot (make-posn 10 20) 29 31 "button-down")
+ (make-posn 29 31))
+(check-expect
+ (reset-dot (make-posn 10 20) 29 31 "button-up")
+ (make-posn 10 20))
+
+(define (reset-dot p x y me)
+  (cond
+    ((mouse=? me "button-down") (make-posn x y))
+    (else p)))
