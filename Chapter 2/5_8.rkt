@@ -18,7 +18,7 @@
          (sqr (r3-y p))
          (sqr (r3-z p)))))
 
-;EXERCISE 80
+; EXERCISE 81
 (define-struct time (h m s))
 ; Time structure
 ; (make-time Number Number Number)
@@ -32,3 +32,23 @@
   (+ (time-s t)
      (* (time-m t) 60)
      (* (time-h t) 3600)))
+
+; EXERCISE 82
+(define-struct 3-word (1st 2nd 3rd))
+; Word structure
+; (make 3-word Character Character Character)
+(define word1 (make-3-word "a" "b" "c"))
+(define word2 (make-3-word "c" "d" "e"))
+(define word3 (make-3-word "c" "b" "d"))
+
+; 3-Word (Character Character Character) -> 3-Word (Bool Bool Bool)
+; Returns a 3-word with boolean fields for comparison
+(check-expect (compare-word word1 word1) (make-3-word #t #t #t))
+(check-expect (compare-word word1 word2) (make-3-word #f #f #f))
+(check-expect (compare-word word1 word3) (make-3-word #f #t #f))
+
+(define (compare-word w1 w2)
+  (make-3-word
+   (cond [(eq? (3-word-1st w1) (3-word-1st w2)) #t] [else #f])
+   (cond [(eq? (3-word-2nd w1) (3-word-2nd w2)) #t] [else #f])
+   (cond [(eq? (3-word-3rd w1) (3-word-3rd w2)) #t] [else #f])))
